@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="es-ES">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulario de Jornada Laboral</title>
+  <style>
+    /* Estilos globales */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 50px;
+      padding: 50px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 50px auto;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      font-size: 24px;
+      margin: 0;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    form {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+
+    button {
+      display: inline-block;
+      background-color: #333;
+      color: #fff;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      background-color: #555;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    th,
+    td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    tfoot td {
+      font-weight: bold;
+    }
+
+    /* Estilos específicos para dispositivos móviles */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 20px;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      select {
+        font-size: 14px;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 14px;
+      }
+
+      table {
+        font-size: 14px;
+      }
+    }
+
+    .observaciones {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .observaciones textarea {
+      width: 100%;
+      height: 100px;
+      resize: vertical;
+    }
+  </style>
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/file-saver/dist/FileSaver.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.min.js"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body onbeforeunload="return confirmarReinicio();">
+  <div class="container">
+    <h1>Formulario de Jornada Laboral</h1>
+    <form>
+      <!-- NOMBRE -->
+      <label for="nombre">Nombre:</label>
+      <input type="text" id="nombre" name="nombre" required><br><br>
+
+      <!-- TIP -->
+      <label for="tip">TIP:</label>
+      <input type="text" id="tip" name="tip" required><br><br>
+
+      <!-- EMAIL -->
+      <label for="email">Correo Electrónico:</label>
+      <input type="email" id="email" name="email" required><br><br>
+
+      <!-- AÑO -->
+      <label for="anio">Año:</label>
+      <select id="anio" name="anio" onchange="generarTabla()">
+        <option value="2023">2023</option>
+        <option value="2024">2024</option>
+        <option value="2025">2025</option>
+      </select><br><br>
+
+      <!-- MES -->
+      <label for="mes">Mes:</label>
+      <select id="mes" name="mes" onchange="generarTabla()">
+        <option value="1">Enero</option>
+        <option value="2">Febrero</option>
+        <option value="3">Marzo</option>
+        <option value="4">Abril</option>
+        <option value="5">Mayo</option>
+        <option value="6">Junio</option>
+        <option value="7">Julio</option>
+        <option value="8">Agosto</option>
+        <option value="9">Septiembre</option>
+        <option value="10">Octubre</option>
+        <option value="11">Noviembre</option>
+        <option value="12">Diciembre</option>
+      </select><br><br>
+    </form>
+
+    <!-- TABLA -->
+    <table id="tabla">
+      <thead>
+        <tr>
+          <th>Día de la Semana</th>
+          <th>Día</th>
+          <th>Hora de Entrada</th>
+          <th>Hora de Salida</th>
+          <th>Total Jornada</th>
+          <th>Nocturnidad</th>
+          <th>Festivos</th>
+          <th>Horas Ordinarias</th>
+          <th>Horas Extras</th>
+          <th>Servicio</th>
+          <th>Servicio mismo día</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Las filas de la tabla serán generadas automáticamente -->
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="1">Total:</td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td id="total-jornada-sum"></td>
+          <td id="nocturnidad-sum"></td>
+          <td id="festivos-sum"></td>
+          <td id="horas-ordinarias-sum"></td>
+          <td id="horas-extras-sum"></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <!-- OBSERVACIONES -->
+    <div class="observaciones" align="center">
+      <div align="center">
+        <h2>Observaciones:</h2>
+        <textarea placeholder="Escribe tus observaciones aquí"></textarea>
+      </div>
+    </div>
+
+    <!-- BOTONES -->
+    <div align="center">
+      <button class="button" onclick="descargarExcel()">Descargar Excel</button>
+      <button onclick="descargarPDF()">Descargar PDF</button>
+      <button id="compartirButton">Compartir</button>
+    </div>
+  </div>
+
+  <script>
+    // Función para confirmar el reinicio del formulario
+    function confirmarReinicio() {
+      if (confirm('¿Estás seguro de que quieres reiniciar el formulario?')) {
+        window.location.reload();
+      }
+    }
+
+    // Función para generar la tabla
+    function generarTabla() {
+      var anio = document.getElementById("anio").value;
+      var mes = document.getElementById("mes").value;
+      var diasEnMes = new Date(anio, mes, 0).getDate();
+      var tabla = document.getElementById("tabla").getElementsByTagName("tbody")[0];
+      tabla.innerHTML = "";
+
+      for (var dia = 1; dia <= diasEnMes; dia++) {
+        var fila = document.createElement("tr");
+        var diaSemana = new Date(anio, mes - 1, dia).toLocaleDateString("es-ES", { weekday: 'long' });
+        var diaNumerico = new Date(anio, mes - 1, dia).getDate();
+
+        fila.innerHTML = `
+          <td>${diaSemana}</td>
+          <td>${diaNumerico}</td>
+          <td><select>${generarOpcionesHoras()}</select></td>
+          <td><select>${generarOpcionesHoras()}</select></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td><input type="text"></td>
+          <td><button onclick="clonarFila(this)">+</button></td>
+        `;
+
+        tabla.appendChild(fila);
+      }
+
+      // Agregar event listeners a los selectores de horas
+      document.getElementById("tabla").addEventListener("change", function(event) {
+        var target = event.target;
+        if (target.tagName === "SELECT") {
+          var fila = target.closest("tr");
+          calcularTotalJornada(fila);
+          calcularNocturnidad(fila);
+          calcularHorasFestivos(fila);
+          calcularHorasOrdinarias();
+        }
+      });
+    }
+
+    // Función para generar opciones de horas
+    function generarOpcionesHoras() {
+      var opciones = [];
+      for (var hora = 0; hora < 24; hora++) {
+        for (var minuto = 0; minuto < 60; minuto += 30) {
+          var horaFormateada = hora.toString().padStart(2, "0");
+          var minutoFormateado = minuto.toString().padStart(2, "0");
+          opciones.push(`<option value='${horaFormateada}:${minutoFormateado}'>${horaFormateada}:${minutoFormateado}</option>`);
+        }
+      }
+      return opciones.join("");
+    }
+
+    // Función para calcular el total de la jornada
+    function calcularTotalJornada(fila) {
+      var entrada = fila.cells[2].querySelector("select").value.split(":");
+      var salida = fila.cells[3].querySelector("select").value.split(":");
+      var horaEntrada = parseInt(entrada[0]);
+      var minutoEntrada = parseInt(entrada[1]);
+      var horaSalida = parseInt(salida[0]);
+      var minutoSalida = parseInt(salida[1]);
+
+      var totalHoras = 0;
+
+      if (horaSalida > horaEntrada || (horaSalida === horaEntrada && minutoSalida >= minutoEntrada)) {
+        totalHoras = (horaSalida - horaEntrada) + (minutoSalida - minutoEntrada) / 60;
+      } else {
+        totalHoras = (24 - horaEntrada + horaSalida) + (minutoSalida - minutoEntrada) / 60;
+      }
+
+      totalHoras = Math.max(totalHoras, 0);
+      fila.cells[4].textContent = totalHoras.toFixed(2);
+      calcularSumaTotalJornada();
+      calcularHorasOrdinarias();
+    }
+
+    // Función para calcular la nocturnidad
+    function calcularNocturnidad(fila) {
+      var entrada = fila.cells[2].querySelector("select").value.split(":");
+      var salida = fila.cells[3].querySelector("select").value.split(":");
+      var horaEntrada = parseInt(entrada[0]);
+      var minutoEntrada = parseInt(entrada[1]);
+      var horaSalida = parseInt(salida[0]);
+      var minutoSalida = parseInt(salida[1]);
+
+      var nocturnidad = 0;
+
+      if (horaSalida < horaEntrada || (horaSalida === horaEntrada && minutoSalida < minutoEntrada)) {
+        horaSalida += 24;
+      }
+
+      if (horaEntrada >= 22 || (horaEntrada >= 0 && horaEntrada < 6 && horaSalida >= 6)) {
+        nocturnidad = horaSalida - horaEntrada + (minutoSalida - minutoEntrada) / 60;
+      } else if (horaEntrada < 6 && horaSalida >= 6 && horaSalida < 22) {
+        nocturnidad = 6 - horaEntrada + (horaSalida - 22) + (minutoSalida - minutoEntrada) / 60;
+      } else if (horaEntrada < 22 && horaSalida >= 22) {
+        nocturnidad = (horaSalida - 22) + (minutoSalida - minutoEntrada) / 60;
+      } else if (horaEntrada >= 0 && horaSalida < 6) {
+        nocturnidad = horaSalida + (minutoSalida - minutoEntrada) / 60;
+      }
+
+      nocturnidad = Math.max(nocturnidad, 0);
+      nocturnidad = Math.min(nocturnidad, 8);
+      fila.cells[5].textContent = nocturnidad.toFixed(2);
+      calcularSumaNocturnidad();
+    }
+
+    // Función para calcular las horas festivas
+    function calcularHorasFestivos(fila) {
+      var diaSemana = fila.cells[0].textContent;
+      var entrada = fila.cells[2].querySelector("select").value.split(":");
+      var salida = fila.cells[3].querySelector("select").value.split(":");
+      var horaEntrada = parseInt(entrada[0]);
+      var minutoEntrada = parseInt(entrada[1]);
+      var horaSalida = parseInt(salida[0]);
+      var minutoSalida = parseInt(salida[1]);
+
+      var horasFestivos = 0;
+
+      if (diaSemana === "viernes") {
+        if (horaSalida < horaEntrada || (horaSalida === horaEntrada && minutoSalida < minutoEntrada)) {
+          horaSalida += 24;
+        }
+        if (horaSalida > 23 || (horaSalida === 23 && minutoSalida === 59)) {
+          horasFestivos += (horaSalida - 24) + (minutoSalida / 60);
+        }
+      } else if (diaSemana === "sábado") {
+        if (horaSalida < horaEntrada || (horaSalida === horaEntrada && minutoSalida < minutoEntrada)) {
+          horasFestivos = 24 - horaEntrada + horaSalida + (minutoSalida - minutoEntrada) / 60;
+        } else {
+          horasFestivos = horaSalida - horaEntrada + (minutoSalida - minutoEntrada) / 60;
+        }
+      } else if (diaSemana === "domingo") {
+        if (horaSalida < horaEntrada || (horaSalida === horaEntrada && minutoSalida < minutoEntrada)) {
+          horasFestivos = 24 - horaEntrada + (minutoSalida - minutoEntrada) / 60;
+        } else {
+          horasFestivos = horaSalida - horaEntrada + (minutoSalida - minutoEntrada) / 60;
+        }
+        if (horaSalida >= 24) {
+          horasFestivos = 24 - horaEntrada;
+        }
+      }
+
+      horasFestivos = Math.max(horasFestivos, 0);
+      fila.cells[6].textContent = horasFestivos.toFixed(2);
+      calcularSumaFestivos();
+    }
+
+    // Función para calcular las horas ordinarias
+    function calcularHorasOrdinarias() {
+      var filas = document.getElementById("tabla").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+      var totalHorasOrdinarias = 0;
+
+      for (var i = 0; i < filas.length; i++) {
+        var fila = filas[i];
+        var totalJornada = parseFloat(fila.cells[4].textContent);
+        var celdaHorasOrdinarias = fila.cells[7];
+
+        if (!isNaN(totalJornada)) {
+          totalHorasOrdinarias += totalJornada;
+          celdaHorasOrdinarias.textContent = totalHorasOrdinarias.toFixed(2);
+        } else {
+          celdaHorasOrdinarias.textContent = "";
+        }
+      }
+      calcularSumaHorasOrdinarias();
+      calcularHorasExtras();
+    }
+
+    // Función para calcular las horas extras
+    function calcularHorasExtras() {
+      var filas = document.getElementById("tabla").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+
+      for (var i = 0; i < filas.length; i++) {
+        var fila = filas[i];
+        var horasOrdinarias = parseFloat(fila.cells[7].textContent);
+        var celdaHorasExtras = fila.cells[8];
+
+        if (horasOrdinarias >= 162) {
+          var horasExtras = horasOrdinarias - 162;
+          celdaHorasExtras.textContent = horasExtras.toFixed(2);
+        } else {
+          celdaHorasExtras.textContent = "";
+        }
+      }
+      calcularSumaHorasExtras();
+    }
+
+    // Funciones para calcular las sumas totales
+    function calcularSumaTotalJornada() {
+      calcularSuma(4, "total-jornada-sum");
+    }
+
+    function calcularSumaNocturnidad() {
+      calcularSuma(5, "nocturnidad-sum");
+    }
+
+    function calcularSumaFestivos() {
+      calcularSuma(6, "festivos-sum");
+    }
+
+    function calcularSumaHorasOrdinarias() {
+      calcularSuma(7, "horas-ordinarias-sum");
+    }
+
+    function calcularSumaHorasExtras() {
+      calcularSuma(8, "horas-extras-sum");
+    }
+
+    // Función genérica para calcular sumas
+    function calcularSuma(columna, idSuma) {
+      var filas = document.getElementById("tabla").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+      var suma = 0;
+
+      for (var i = 0; i < filas.length; i++) {
+        var valor = parseFloat(filas[i].cells[columna].textContent);
+        if (!isNaN(valor)) {
+          suma += valor;
+        }
+      }
+
+      document.getElementById(idSuma).textContent = suma.toFixed(2);
+    }
+
+    // Función para clonar una fila
+    function clonarFila(button) {
+      var filaActual = button.parentNode.parentNode;
+      var nuevaFila = filaActual.cloneNode(true);
+      var botonEliminar = document.createElement("button");
+      botonEliminar.textContent = "-";
+      botonEliminar.onclick = function() {
+        this.parentNode.parentNode.remove();
+        calcularHorasOrdinarias();
+      };
+      nuevaFila.cells[10].innerHTML = "";
+      nuevaFila.cells[10].appendChild(botonEliminar);
+      filaActual.parentNode.insertBefore(nuevaFila, filaActual.nextSibling);
+    }
+
+    // Función para descargar el archivo Excel
+    function descargarExcel() {
+      var tabla = document.getElementById("tabla");
+      var datos = [];
+      var encabezado = [];
+      var nombresMeses = [
+        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+      ];
+
+      var anio = document.getElementById("anio").value;
+      var mesSeleccionado = parseInt(document.getElementById("mes").value);
+      var nombre = document.getElementById("nombre").value;
+      var tip = document.getElementById("tip").value;
+
+      for (var i = 1; i < tabla.rows.length; i++) {
+        var fila = tabla.rows[i];
+        var filaDatos = [];
+
+        for (var j = 0; j < fila.cells.length; j++) {
+          if (j === 9) {
+            var inputServicio = fila.cells[j].querySelector("input");
+            filaDatos.push(inputServicio ? inputServicio.value : "");
+          } else if (j !== 10) {
+            if (j === 2 || j === 3) {
+              var seleccionable = fila.cells[j].querySelector("select");
+              var siguienteSeleccionable = j + 1 < fila.cells.length ? fila.cells[j + 1].querySelector("select") : null;
+
+              if (siguienteSeleccionable && seleccionable.value && seleccionable.value === siguienteSeleccionable.value) {
+                filaDatos.push("");
+                j++;
+              } else {
+                filaDatos.push(seleccionable ? seleccionable.value : "");
+              }
+            } else {
+              filaDatos.push(fila.cells[j].textContent);
+            }
+          }
+        }
+
+        datos.push(filaDatos);
+      }
+
+      for (var i = 0; i < tabla.rows[0].cells.length; i++) {
+        if (i === 9) {
+          encabezado.push("Servicio");
+        } else if (i !== 10) {
+          encabezado.push(tabla.rows[0].cells[i].textContent);
+        }
+      }
+
+      var workbook = XLSX.utils.book_new();
+      var worksheet = XLSX.utils.aoa_to_sheet([encabezado].concat(datos), { origin: "A8" });
+      worksheet["!orientation"] = "landscape";
+
+      var titulo = "REGISTRO DIARIO DE JORNADA: TRABAJADOR A JORNADA COMPLETA/PARCIAL";
+      var rangoTitulo = "C1:K1";
+      var mergeTitulo = { s: { r: 0, c: 2 }, e: { r: 0, c: 10 } };
+      var mergeCeldas = { s: { r: 1, c: 2 }, e: { r: 1, c: 10 } };
+      var mergeCeldasEmpresa = { s: { r: 3, c: 3 }, e: { r: 3, c: 5 } };
+      var mergeCeldasCIF = { s: { r: 3, c: 7 }, e: { r: 3, c: 8 } };
+      var mergeCeldasTrabajador = { s: { r: 4, c: 3 }, e: { r: 4, c: 5 } };
+      var mergeCeldasTip = { s: { r: 4, c: 7 }, e: { r: 4, c: 8 } };
+
+      var merges = [
+        mergeTitulo, mergeCeldas, mergeCeldasEmpresa,
+        mergeCeldasCIF, mergeCeldasTrabajador, mergeCeldasTip
+      ];
+
+      worksheet["C1"] = { v: titulo, t: "s", s: { font: { bold: true }, alignment: { horizontal: "center" } } };
+      worksheet["C2"] = { v: "En cumplimiento a la obligación establecida en los art. 12.5h) y 35.5 del Estatuto de los Trabajadores", t: "s", s: { font: { sz: 7 } } };
+      worksheet["K5"] = { v: nombresMeses[mesSeleccionado - 1].toUpperCase(), t: "s", s: { font: { sz: 9 } } };
+
+      XLSX.utils.sheet_add_aoa(worksheet, [
+        ["EMPRESA", "GASTEIZ DE VIGILANCIA", "", "", "CIF", "B01412840", "", "AÑO", anio],
+        ["TRABAJADOR", nombre, "", "", "TIP", tip, "", "MES"]
+      ], { origin: "C4" });
+
+      worksheet["!merges"] = merges;
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Datos");
+
+      var archivoExcel = XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
+      var nombreMes = nombresMeses[mesSeleccionado - 1].toLowerCase();
+      var nombreArchivo = nombreMes + "_" + anio + ".xlsx";
+
+      if (typeof window.navigator.msSaveBlob !== "undefined") {
+        var blobArchivo = new Blob([s2ab(archivoExcel)], { type: "application/octet-stream" });
+        navigator.msSaveBlob(blobArchivo, nombreArchivo);
+      } else {
+        var blobArchivo = new Blob([s2ab(archivoExcel)], { type: "application/octet-stream" });
+        var urlArchivo = URL.createObjectURL(blobArchivo);
+        var linkDescarga = document.createElement("a");
+        linkDescarga.href = urlArchivo;
+        linkDescarga.download = nombreArchivo;
+        linkDescarga.click();
+      }
+
+      function s2ab(s) {
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i = 0; i < s.length; i++) {
+          view[i] = s.charCodeAt(i) & 0xFF;
+        }
+        return buf;
+      }
+    }
+
+    function descargarPDF() {
+  var nombre = document.getElementById("nombre").value;
+  var tip = document.getElementById("tip").value;
+  var email = document.getElementById("email").value;
+  var filas = document.getElementById("tabla").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+  var datos = [];
+  var anio = document.getElementById("anio").value;
+  var mes = document.getElementById("mes").value;
+  var nombreMes = getNombreMes(parseInt(mes));
+
+  // Obtener el contenido del textarea de observaciones
+  var observaciones = document.querySelector(".observaciones textarea").value;
+
+  for (var i = 0; i < filas.length; i++) {
+    var fila = filas[i];
+    var filaDatos = [];
+
+    for (var j = 0; j < fila.cells.length; j++) {
+      var celda = fila.cells[j];
+      if (j === 9) {
+        var inputServicio = celda.querySelector("input");
+        filaDatos.push(inputServicio ? inputServicio.value : "");
+      } else if (j !== 10) {
+        var contenido = celda.textContent.trim();
+        filaDatos.push(contenido);
+      }
+    }
+
+    var horaEntrada = fila.cells[2].querySelector("select").value;
+    var horaSalida = fila.cells[3].querySelector("select").value;
+
+    if (horaEntrada !== "" && horaSalida !== "") {
+      filaDatos[2] = horaEntrada;
+      filaDatos[3] = horaSalida;
+      datos.push(filaDatos);
+    }
+  }
+
+  fetch('https://upload.wikimedia.org/wikipedia/commons/1/16/Gasteiz_de_Vigilancia.jpg')
+    .then(response => response.blob())
+    .then(blob => {
+      var reader = new FileReader();
+      reader.onloadend = function() {
+        var imageUrl = reader.result;
+
+        var docDefinition = {
+          pageSize: 'A4',
+          pageOrientation: 'landscape',
+          content: [
+            { text: 'REGISTRO DIARIO DE JORNADA', style: 'header' },
+            { text: `Trabajador a Jornada Completa/Parcial - ${nombreMes} ${anio}`, style: 'subheader' },
+            { text: '', style: 'space' },
+            {
+              table: {
+                headerRows: 1,
+                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                body: [
+                  ['Día de la Semana', 'Día', 'Hora de Entrada', 'Hora de Salida', 'Total Jornada', 'Nocturnidad', 'Festivos', 'Horas Ordinarias', 'Horas Extras', 'Servicio'],
+                  ...datos
+                ],
+                layout: {
+                  hLineWidth: function(i, node) {
+                    return (i === 0 || i === node.table.body.length) ? 2 : 1;
+                  },
+                  vLineWidth: function(i, node) {
+                    return (i === 0 || i === node.table.widths.length) ? 2 : 1;
+                  },
+                  hLineColor: function(i, node) {
+                    return (i === 0 || i === node.table.body.length) ? 'black' : 'gray';
+                  },
+                  vLineColor: function(i, node) {
+                    return (i === 0 || i === node.table.widths.length) ? 'black' : 'gray';
+                  }
+                }
+              }
+            },
+            // Añadir las observaciones al PDF
+            { text: 'Observaciones:', style: 'subheader', margin: [0, 20, 0, 10] },
+            { text: observaciones, style: 'observaciones' }
+          ],
+          header: function(currentPage, pageCount) {
+            return {
+              columns: [
+                { width: 50, image: imageUrl, alignment: 'left' },
+                { text: '', width: '*', alignment: 'left' }
+              ],
+              margin: [20, 20, 20, 0]
+            };
+          },
+          footer: function(currentPage, pageCount) {
+            return {
+              text: `Página ${currentPage.toString()} de ${pageCount}`,
+              alignment: 'center',
+              margin: [0, 10, 0, 20]
+            };
+          },
+          styles: {
+            header: {
+              fontSize: 14,
+              bold: true,
+              alignment: 'center'
+            },
+            subheader: {
+              fontSize: 10,
+              bold: true,
+              alignment: 'center'
+            },
+            space: {
+              margin: [0, 10, 0, 10]
+            },
+            observaciones: {
+              fontSize: 10,
+              margin: [0, 10, 0, 20]
+            }
+          },
+          pageMargins: [40, 80, 40, 60]
+        };
+
+        pdfMake.createPdf(docDefinition).download(`Registro_Jornada_${nombreMes}_${anio}`);
+      };
+
+      reader.readAsDataURL(blob);
+    });
+}
+
+    // Función para obtener el nombre del mes
+    function getNombreMes(mes) {
+      var meses = [
+        "enero", "febrero", "marzo", "abril", "mayo", "junio",
+        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
+      ];
+      return meses[mes - 1];
+    }
+
+    // Función para compartir contenido
+    function compartirContenido() {
+      if (navigator.share) {
+        navigator.share({
+          title: 'Compartir Contenido',
+          text: '¡Echa un vistazo a este contenido increíble!',
+        })
+        .then(() => console.log('Contenido compartido con éxito'))
+        .catch((error) => console.error('Error al compartir:', error));
+      } else {
+        console.warn('La función de compartir no es compatible en este navegador.');
+      }
+    }
+
+    // Event listener para el botón de compartir
+    document.getElementById("compartirButton").addEventListener("click", compartirContenido);
+
+    // Inicialización de la tabla al cargar la página
+    window.onload = function () {
+      generarTabla();
+      calcularSumaTotalJornada();
+      calcularSumaNocturnidad();
+      calcularSumaFestivos();
+      calcularSumaHorasOrdinarias();
+      calcularSumaHorasExtras();
+    };
+  </script>
+</body>
+</html>
