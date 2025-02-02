@@ -578,129 +578,145 @@
     }
 
     function descargarPDF() {
-  var nombre = document.getElementById("nombre").value;
-  var tip = document.getElementById("tip").value;
-  var email = document.getElementById("email").value;
-  var filas = document.getElementById("tabla").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
-  var datos = [];
-  var anio = document.getElementById("anio").value;
-  var mes = document.getElementById("mes").value;
-  var nombreMes = getNombreMes(parseInt(mes));
+      var nombre = document.getElementById("nombre").value;
+      var tip = document.getElementById("tip").value;
+      var email = document.getElementById("email").value;
+      var filas = document.getElementById("tabla").getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+      var datos = [];
+      var anio = document.getElementById("anio").value;
+      var mes = document.getElementById("mes").value;
+      var nombreMes = getNombreMes(parseInt(mes));
 
-  // Obtener el contenido del textarea de observaciones
-  var observaciones = document.querySelector(".observaciones textarea").value;
+      // Obtener el contenido del textarea de observaciones
+      var observaciones = document.querySelector(".observaciones textarea").value;
 
-  for (var i = 0; i < filas.length; i++) {
-    var fila = filas[i];
-    var filaDatos = [];
+      for (var i = 0; i < filas.length; i++) {
+        var fila = filas[i];
+        var filaDatos = [];
 
-    for (var j = 0; j < fila.cells.length; j++) {
-      var celda = fila.cells[j];
-      if (j === 9) {
-        var inputServicio = celda.querySelector("input");
-        filaDatos.push(inputServicio ? inputServicio.value : "");
-      } else if (j !== 10) {
-        var contenido = celda.textContent.trim();
-        filaDatos.push(contenido);
+        for (var j = 0; j < fila.cells.length; j++) {
+          var celda = fila.cells[j];
+          if (j === 9) {
+            var inputServicio = celda.querySelector("input");
+            filaDatos.push(inputServicio ? inputServicio.value : "");
+          } else if (j !== 10) {
+            var contenido = celda.textContent.trim();
+            filaDatos.push(contenido);
+          }
+        }
+
+        var horaEntrada = fila.cells[2].querySelector("select").value;
+        var horaSalida = fila.cells[3].querySelector("select").value;
+
+        if (horaEntrada !== "" && horaSalida !== "") {
+          filaDatos[2] = horaEntrada;
+          filaDatos[3] = horaSalida;
+          datos.push(filaDatos);
+        }
       }
-    }
 
-    var horaEntrada = fila.cells[2].querySelector("select").value;
-    var horaSalida = fila.cells[3].querySelector("select").value;
+      fetch('https://upload.wikimedia.org/wikipedia/commons/1/16/Gasteiz_de_Vigilancia.jpg')
+        .then(response => response.blob())
+        .then(blob => {
+          var reader = new FileReader();
+          reader.onloadend = function() {
+            var imageUrl = reader.result;
 
-    if (horaEntrada !== "" && horaSalida !== "") {
-      filaDatos[2] = horaEntrada;
-      filaDatos[3] = horaSalida;
-      datos.push(filaDatos);
-    }
-  }
-
-  fetch('https://upload.wikimedia.org/wikipedia/commons/1/16/Gasteiz_de_Vigilancia.jpg')
-    .then(response => response.blob())
-    .then(blob => {
-      var reader = new FileReader();
-      reader.onloadend = function() {
-        var imageUrl = reader.result;
-
-        var docDefinition = {
-          pageSize: 'A4',
-          pageOrientation: 'landscape',
-          content: [
-            { text: 'REGISTRO DIARIO DE JORNADA', style: 'header' },
-            { text: `Trabajador a Jornada Completa/Parcial - ${nombreMes} ${anio}`, style: 'subheader' },
-            { text: '', style: 'space' },
-            {
-              table: {
-                headerRows: 1,
-                widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
-                body: [
-                  ['Día de la Semana', 'Día', 'Hora de Entrada', 'Hora de Salida', 'Total Jornada', 'Nocturnidad', 'Festivos', 'Horas Ordinarias', 'Horas Extras', 'Servicio'],
-                  ...datos
-                ],
-                layout: {
-                  hLineWidth: function(i, node) {
-                    return (i === 0 || i === node.table.body.length) ? 2 : 1;
-                  },
-                  vLineWidth: function(i, node) {
-                    return (i === 0 || i === node.table.widths.length) ? 2 : 1;
-                  },
-                  hLineColor: function(i, node) {
-                    return (i === 0 || i === node.table.body.length) ? 'black' : 'gray';
-                  },
-                  vLineColor: function(i, node) {
-                    return (i === 0 || i === node.table.widths.length) ? 'black' : 'gray';
+            var docDefinition = {
+              pageSize: 'A4',
+              pageOrientation: 'landscape',
+              content: [
+                { text: 'REGISTRO DIARIO DE JORNADA', style: 'header' },
+                { text: `Trabajador a Jornada Completa/Parcial - ${nombreMes} ${anio}`, style: 'subheader' },
+                { text: '', style: 'space' },
+                {
+                  table: {
+                    headerRows: 1,
+                    widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
+                    body: [
+                      ['Día de la Semana', 'Día', 'Hora de Entrada', 'Hora de Salida', 'Total Jornada', 'Nocturnidad', 'Festivos', 'Horas Ordinarias', 'Horas Extras', 'Servicio'],
+                      ...datos
+                    ],
+                    layout: {
+                      hLineWidth: function(i, node) {
+                        return (i === 0 || i === node.table.body.length) ? 2 : 1;
+                      },
+                      vLineWidth: function(i, node) {
+                        return (i === 0 || i === node.table.widths.length) ? 2 : 1;
+                      },
+                      hLineColor: function(i, node) {
+                        return (i === 0 || i === node.table.body.length) ? 'black' : 'gray';
+                      },
+                      vLineColor: function(i, node) {
+                        return (i === 0 || i === node.table.widths.length) ? 'black' : 'gray';
+                      }
+                    }
                   }
-                }
-              }
-            },
-            // Añadir las observaciones al PDF
-            { text: 'Observaciones:', style: 'subheader', margin: [0, 20, 0, 10] },
-            { text: observaciones, style: 'observaciones' }
-          ],
-          header: function(currentPage, pageCount) {
-            return {
-              columns: [
-                { width: 50, image: imageUrl, alignment: 'left' },
-                { text: '', width: '*', alignment: 'left' }
+                },
+                // Añadir las observaciones al PDF
+                { text: 'Observaciones:', style: 'subheader', margin: [0, 20, 0, 10] },
+                { text: observaciones, style: 'observaciones' }
               ],
-              margin: [20, 20, 20, 0]
+              header: function(currentPage, pageCount) {
+                return {
+                  columns: [
+                    { width: 50, image: imageUrl, alignment: 'left' },
+                    { text: '', width: '*', alignment: 'left' }
+                  ],
+                  margin: [20, 20, 20, 0]
+                };
+              },
+              footer: function(currentPage, pageCount) {
+                return {
+                  text: `Página ${currentPage.toString()} de ${pageCount}`,
+                  alignment: 'center',
+                  margin: [0, 10, 0, 20]
+                };
+              },
+              styles: {
+                header: {
+                  fontSize: 14,
+                  bold: true,
+                  alignment: 'center'
+                },
+                subheader: {
+                  fontSize: 10,
+                  bold: true,
+                  alignment: 'center'
+                },
+                space: {
+                  margin: [0, 10, 0, 10]
+                },
+                observaciones: {
+                  fontSize: 10,
+                  margin: [0, 10, 0, 20]
+                }
+              },
+              pageMargins: [40, 80, 40, 60]
             };
-          },
-          footer: function(currentPage, pageCount) {
-            return {
-              text: `Página ${currentPage.toString()} de ${pageCount}`,
-              alignment: 'center',
-              margin: [0, 10, 0, 20]
-            };
-          },
-          styles: {
-            header: {
-              fontSize: 14,
-              bold: true,
-              alignment: 'center'
-            },
-            subheader: {
-              fontSize: 10,
-              bold: true,
-              alignment: 'center'
-            },
-            space: {
-              margin: [0, 10, 0, 10]
-            },
-            observaciones: {
-              fontSize: 10,
-              margin: [0, 10, 0, 20]
-            }
-          },
-          pageMargins: [40, 80, 40, 60]
-        };
 
-        pdfMake.createPdf(docDefinition).download(`Registro_Jornada_${nombreMes}_${anio}`);
-      };
+            pdfMake.createPdf(docDefinition).getBlob(function(blob) {
+              var pdfBlob = blob;
+              var pdfUrl = URL.createObjectURL(pdfBlob);
 
-      reader.readAsDataURL(blob);
-    });
-}
+              // Crear un enlace temporal para descargar el PDF
+              var link = document.createElement('a');
+              link.href = pdfUrl;
+              link.download = `Registro_Jornada_${nombreMes}_${anio}.pdf`;
+              link.click();
+
+              // Enviar el PDF por correo electrónico
+              var emailSubject = `Registro de Jornada Laboral - ${nombreMes} ${anio}`;
+              var emailBody = `Adjunto encontrarás el registro de jornada laboral para el mes de ${nombreMes} ${anio}.`;
+              var mailtoLink = `mailto:${email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}&attachment=${encodeURIComponent(pdfUrl)}`;
+
+              window.location.href = mailtoLink;
+            });
+          };
+
+          reader.readAsDataURL(blob);
+        });
+    }
 
     // Función para obtener el nombre del mes
     function getNombreMes(mes) {
@@ -713,16 +729,7 @@
 
     // Función para compartir contenido
     function compartirContenido() {
-      if (navigator.share) {
-        navigator.share({
-          title: 'Compartir Contenido',
-          text: '¡Echa un vistazo a este contenido increíble!',
-        })
-        .then(() => console.log('Contenido compartido con éxito'))
-        .catch((error) => console.error('Error al compartir:', error));
-      } else {
-        console.warn('La función de compartir no es compatible en este navegador.');
-      }
+      descargarPDF();
     }
 
     // Event listener para el botón de compartir
