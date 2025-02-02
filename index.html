@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Vitoria-Gasteiz</title>
+    <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="menu">
+        <h1>Bienvenido al Juego de Vitoria-Gasteiz</h1>
+        <p>Instrucciones:</p>
+        <ul>
+            <li>El juego utiliza tu ubicación GPS para guiarte por diferentes puntos de interés en Vitoria-Gasteiz.</li>
+            <li>Cuando llegues a una coordenada específica, aparecerá un personaje que te contará una historia sobre ese lugar.</li>
+            <li>Asegúrate de tener el GPS activado y permitir el acceso a tu ubicación.</li>
+        </ul>
+        <button id="startButton">Comenzar Juego</button>
+    </div>
+
+    <div id="game" style="display:none;">
+        <h2>Juego en Curso</h2>
+        <p id="locationStatus">Obteniendo ubicación...</p>
+        <div id="map" style="height: 500px; width: 100%; margin: 20px 0;"></div>
+        <div id="character" style="display:none;">
+            <img src="character.png" alt="Personaje">
+            <p id="story"></p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
