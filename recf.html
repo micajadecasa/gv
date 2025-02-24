@@ -717,7 +717,18 @@
               link.download = `Registro_Jornada_${nombreMes}_${anio}.pdf`;
               link.click();
 
-             
+             // Enviar el PDF por correo electrónico
+              var emailSubject = `Registro de Jornada Laboral - ${nombreMes} ${anio}`;
+              var emailBody = `Adjunto encontrarás el registro de jornada laboral para el mes de ${nombreMes} ${anio}.`;
+              var mailtoLink = `mailto:${email}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}&attachment=${encodeURIComponent(pdfUrl)}`;
+
+              window.location.href = mailtoLink;
+            });
+          };
+
+          reader.readAsDataURL(blob);
+        });
+    }
 
     // Función para obtener el nombre del mes
     function getNombreMes(mes) {
