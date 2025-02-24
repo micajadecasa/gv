@@ -6,95 +6,119 @@
   <title>Formulario de Jornada Laboral</title>
   <style>
     /* Estilos globales */
-body {
-  font-family: Arial, sans-serif;
-  margin: 10px;
-  padding: 10px;
-}
+    body {
+      font-family: Arial, sans-serif;
+      margin: 50px;
+      padding: 50px;
+    }
 
-.container {
-  max-width: 100%;
-  margin: 10px auto;
-  padding: 10px;
-  box-sizing: border-box;
-}
+    .container {
+      max-width: 960px;
+      margin: 50px auto;
+      padding: 20px;
+      box-sizing: border-box;
+    }
 
-h1 {
-  font-size: 20px;
-  margin: 0;
-  text-align: center;
-  margin-bottom: 10px;
-}
+    h1 {
+      font-size: 24px;
+      margin: 0;
+      text-align: center;
+      margin-bottom: 20px;
+    }
 
-input[type="text"],
-input[type="email"],
-select {
-  width: 100%;
-  padding: 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-  margin-bottom: 8px;
-}
+    form {
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
 
-button {
-  display: inline-block;
-  background-color: #333;
-  color: #fff;
-  padding: 10px 20px;
-  font-size: 14px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin: 5px;
-}
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
 
-.observaciones textarea {
-  width: 100%;
-  height: 80px;
-  resize: vertical;
-}
+    input[type="text"],
+    input[type="email"],
+    select {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
 
-/* Estilos específicos para dispositivos móviles */
-@media (max-width: 600px) {
-  body {
-    margin: 5px;
-    padding: 5px;
-  }
+    button {
+      display: inline-block;
+      background-color: #333;
+      color: #fff;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
 
-  .container {
-    margin: 5px auto;
-    padding: 5px;
-  }
+    .button:hover {
+      background-color: #555;
+    }
 
-  h1 {
-    font-size: 18px;
-    margin-bottom: 10px;
-  }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
 
-  input[type="text"],
-  input[type="email"],
-  select {
-    padding: 8px;
-    font-size: 14px;
-    margin-bottom: 8px;
-  }
+    th,
+    td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
 
-  button {
-    padding: 8px 16px;
-    font-size: 14px;
-    margin: 5px;
-  }
+    tfoot td {
+      font-weight: bold;
+    }
 
-  .observaciones textarea {
-    height: 80px;
-  }
+    /* Estilos específicos para dispositivos móviles */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 20px;
+      }
 
-  table {
-    font-size: 12px;
-  }
-}
+      input[type="text"],
+      input[type="email"],
+      select {
+        font-size: 14px;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 14px;
+      }
+
+      table {
+        font-size: 14px;
+      }
+    }
+
+    .observaciones {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .observaciones textarea {
+      width: 100%;
+      height: 100px;
+      resize: vertical;
+    }
   </style>
   <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
   <script src="https://unpkg.com/file-saver/dist/FileSaver.min.js"></script>
