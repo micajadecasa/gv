@@ -629,7 +629,16 @@
                 { text: 'REGISTRO DIARIO DE JORNADA', style: 'header' },
                 { text: `Trabajador a Jornada Completa/Parcial - ${nombreMes} ${anio}`, style: 'subheader' },
                 { text: '', style: 'space' },
-                {
+                // Añadir los campos "Nombre" y "TIP"
+            {
+              columns: [
+                { text: `Nombre: ${nombre}`, width: '50%' },
+                { text: `TIP: ${tip}`, width: '50%' }
+              ],
+              margin: [0, 0, 0, 10] // Margen inferior
+            },
+            { text: '', style: 'space' },
+            {
                   table: {
                     headerRows: 1,
                     widths: ['auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'],
