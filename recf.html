@@ -8,14 +8,14 @@
     /* Estilos globales */
     body {
       font-family: Arial, sans-serif;
-      margin: 50px;
-      padding: 50px;
+      margin: 20px;
+      padding: 20px;
     }
 
     .container {
       max-width: 960px;
-      margin: 50px auto;
-      padding: 20px;
+      margin: 0 auto;
+      padding: 10px;
       box-sizing: border-box;
     }
 
@@ -58,9 +58,11 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      width: 100%;
+      margin-bottom: 10px;
     }
 
-    .button:hover {
+    button:hover {
       background-color: #555;
     }
 
@@ -82,8 +84,29 @@
       font-weight: bold;
     }
 
+    .observaciones {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .observaciones textarea {
+      width: 100%;
+      height: 100px;
+      resize: vertical;
+    }
+
     /* Estilos específicos para dispositivos móviles */
     @media (max-width: 600px) {
+      body {
+        margin: 10px;
+        padding: 10px;
+      }
+
       h1 {
         font-size: 20px;
       }
@@ -102,22 +125,48 @@
       table {
         font-size: 14px;
       }
-    }
 
-    .observaciones {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-bottom: 20px;
-      text-align: center;
-    }
+      th,
+      td {
+        padding: 6px;
+      }
 
-    .observaciones textarea {
-      width: 100%;
-      height: 100px;
-      resize: vertical;
+      .container {
+        padding: 5px;
+      }
+
+      /* Convertir la tabla en una lista en dispositivos móviles */
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+      }
+
+      tr {
+        border: 1px solid #ccc;
+        margin-bottom: 10px;
+      }
+
+      td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+      }
+
+      td:before {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        content: attr(data-label);
+      }
     }
   </style>
   <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
@@ -242,17 +291,17 @@
         var diaNumerico = new Date(anio, mes - 1, dia).getDate();
 
         fila.innerHTML = `
-          <td>${diaSemana}</td>
-          <td>${diaNumerico}</td>
-          <td><select>${generarOpcionesHoras()}</select></td>
-          <td><select>${generarOpcionesHoras()}</select></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td><input type="text"></td>
-          <td><button onclick="clonarFila(this)">+</button></td>
+          <td data-label="Día de la Semana">${diaSemana}</td>
+          <td data-label="Día">${diaNumerico}</td>
+          <td data-label="Hora de Entrada"><select>${generarOpcionesHoras()}</select></td>
+          <td data-label="Hora de Salida"><select>${generarOpcionesHoras()}</select></td>
+          <td data-label="Total Jornada"></td>
+          <td data-label="Nocturnidad"></td>
+          <td data-label="Festivos"></td>
+          <td data-label="Horas Ordinarias"></td>
+          <td data-label="Horas Extras"></td>
+          <td data-label="Servicio"><input type="text"></td>
+          <td data-label="Servicio mismo día"><button onclick="clonarFila(this)">+</button></td>
         `;
 
         tabla.appendChild(fila);
